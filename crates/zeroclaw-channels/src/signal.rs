@@ -977,8 +977,6 @@ impl Channel for SignalChannel {
         self.pending_approvals.lock().await.insert(
             token.clone(),
             crate::util::PendingApproval {
-                #[cfg(any(feature = "channel-matrix", test))]
-                prompt_binding: None,
                 sender: tx,
                 destination: Self::canonical_destination(recipient),
                 tool_name: request.tool_name.clone(),
@@ -2016,8 +2014,6 @@ mod tests {
         ch.pending_approvals.lock().await.insert(
             "abc123".to_string(),
             crate::util::PendingApproval {
-                #[cfg(any(feature = "channel-matrix", test))]
-                prompt_binding: None,
                 sender: tx,
                 destination: "+1111111111".to_string(),
                 tool_name: "tool".to_string(),
@@ -2046,8 +2042,6 @@ mod tests {
         ch.pending_approvals.lock().await.insert(
             "abc123".to_string(),
             crate::util::PendingApproval {
-                #[cfg(any(feature = "channel-matrix", test))]
-                prompt_binding: None,
                 sender: approval_tx,
                 destination: "group:other-group".to_string(),
                 tool_name: "tool".to_string(),
@@ -2088,8 +2082,6 @@ mod tests {
         ch.pending_approvals.lock().await.insert(
             "direct".to_string(),
             crate::util::PendingApproval {
-                #[cfg(any(feature = "channel-matrix", test))]
-                prompt_binding: None,
                 sender: tx,
                 destination: "+1111111111".to_string(),
                 tool_name: "tool".to_string(),
