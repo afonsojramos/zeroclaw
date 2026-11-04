@@ -619,6 +619,7 @@ mod argument_preservation_tests {
             turn_id: "argument-preservation",
             serving_provider_name: None,
             serving_model: None,
+            channel_thread_ts: None,
         };
         let name = spec.name.clone();
         let specs = IterationToolSpecs {
@@ -935,6 +936,7 @@ mod cost_usd_regression_tests {
             turn_id: "turn-cost-regression",
             serving_provider_name: None,
             serving_model: None,
+            channel_thread_ts: None,
         };
 
         let specs = IterationToolSpecs {
@@ -1081,6 +1083,7 @@ mod cost_usd_regression_tests {
             turn_id: "malformed-protocol-usage",
             serving_provider_name: None,
             serving_model: None,
+            channel_thread_ts: None,
         };
         let specs = IterationToolSpecs {
             exposed_tool_specs: None,
@@ -1161,6 +1164,7 @@ mod cost_usd_regression_tests {
             turn_id,
             serving_provider_name: None,
             serving_model: None,
+            channel_thread_ts: None,
         }
     }
 

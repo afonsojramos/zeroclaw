@@ -1558,6 +1558,7 @@ mod tests {
             arguments_summary: "action: deactivate".to_string(),
             raw_arguments: None,
             position: Some(ApprovalPosition { index: 2, total: 3 }),
+            thread_ts: None,
         };
 
         assert_eq!(request.position_counter(), Some((2, 3)));
@@ -1572,6 +1573,7 @@ mod tests {
             arguments_summary: "ls -la".to_string(),
             raw_arguments: None,
             position: None,
+            thread_ts: None,
         };
 
         assert_eq!(request.position_counter(), None);
