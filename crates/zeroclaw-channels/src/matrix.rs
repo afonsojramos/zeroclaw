@@ -4767,6 +4767,7 @@ impl MatrixChannel {
         event_id: &OwnedEventId,
         still_live: bool,
         recipient: &str,
+        thread_ts: Option<&str>,
         token: &str,
     ) {
         let attrs = || {
@@ -4782,7 +4783,7 @@ impl MatrixChannel {
             let (failed_tx, failed_rx) = oneshot::channel();
             let fallback = async {
                 if failed_rx.await.is_ok() {
-                    self.send_hidden_typed_commands(client, recipient, token)
+                    self.send_hidden_typed_commands(client, recipient, thread_ts, token)
                         .await;
                 }
             };
@@ -4822,19 +4823,26 @@ impl MatrixChannel {
                     .with_attrs(attrs()),
                 "matrix: approval room missing; skipping reactions"
             );
-            self.send_hidden_typed_commands(client, recipient, token)
+            self.send_hidden_typed_commands(client, recipient, thread_ts, token)
                 .await;
         }
     }
 
     /// Sends the typed approval commands when `approval_typed_instructions`
     /// left them out of the prompt. Failure is logged; the prompt stands.
-    async fn send_hidden_typed_commands(&self, client: &Client, recipient: &str, token: &str) {
+    async fn send_hidden_typed_commands(
+        &self,
+        client: &Client,
+        recipient: &str,
+        thread_ts: Option<&str>,
+        token: &str,
+    ) {
         if self.config.approval_typed_instructions {
             return;
         }
         let reply = crate::util::build_approve_deny_reply_instruction(token);
-        let message = approval::build_prompt_message(reply, recipient);
+        let message =
+            approval::build_prompt_message(reply, recipient, thread_ts.map(str::to_owned));
         if let Err(error) = outbound::send(&self.outbox(client), &message).await {
             ::zeroclaw_log::record!(
                 WARN,
@@ -6045,7 +6053,13 @@ impl Channel for MatrixChannel {
         // timeout. Dropping the request cancels both alongside the decision wait.
         let seed = async {
             self.prepare_approval_reactions(
-                client, &room_id, &event_id, still_live, recipient, &token,
+                client,
+                &room_id,
+                &event_id,
+                still_live,
+                recipient,
+                request.thread_ts.as_deref(),
+                &token,
             )
             .await;
             std::future::pending().await
@@ -9139,6 +9153,7 @@ mod tests {
                     &event_id!("$prompt:localhost").to_owned(),
                     true,
                     "!room:localhost",
+                    None,
                     "APPROVAL",
                 )
                 .await;
